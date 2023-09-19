@@ -12,28 +12,37 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { useAtom } from "jotai";
+import {
+  rangesAtom,
+  isEditingAtom,
+  currentIndexAtom,
+  isFocusViewAtom,
+} from "../../lib/atoms";
+import useHighlights from "../../lib/hooks/useHighlights";
 
 interface SavedHighlightsProps {
-  range: [number, number, string, string];
   index: number;
-  deleteHighlight: (index: number) => void;
-  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
-  setCurrentIndex: React.Dispatch<React.SetStateAction<number>>;
-  isEditing: boolean;
+  range: [number, number, string, string];
 }
 
-const HighlightCard: React.FC<SavedHighlightsProps> = ({
-  range,
-  index,
-  setCurrentIndex,
-  deleteHighlight,
-  setIsEditing,
-  isEditing,
-}) => {
+const HighlightCard: React.FC<SavedHighlightsProps> = ({ range, index }) => {
+  const [ranges, setRanges] = useAtom(rangesAtom);
+  const [isEditing, setIsEditing] = useAtom(isEditingAtom);
+  const [currentIndex, setCurrentIndex] = useAtom(currentIndexAtom);
+  const [isFocusView, setIsFocusView] = useAtom(isFocusViewAtom);
+  const { addHighlight, deleteHighlight, editHighlight } = useHighlights();
+
   const [showNotes, setShowNotes] = useState(false);
   const [notes, setNotes] = useState<string>("");
+  const [showEditing, setShowEditing] = useState(false);
 
   const handleNotes = () => {
+    setShowNotes(!showNotes);
+  };
+
+  const handleSaveNotes = () => {
+    editHighlight(index, [range[0], range[1]], range[2], notes);
     setShowNotes(!showNotes);
   };
 
@@ -42,21 +51,42 @@ const HighlightCard: React.FC<SavedHighlightsProps> = ({
     setShowNotes(!showNotes);
   };
 
-  const handleEdit = () => {
+  const handleEdit = (event: any) => {
     setIsEditing(true);
+    setShowEditing(true);
     setCurrentIndex(index);
   };
 
+  const handleCardClick = () => {
+    setIsFocusView(true);
+    setCurrentIndex(index);
+  };
+
+  useEffect(() => {
+    if (!isEditing) {
+      setShowEditing(false);
+    }
+  }, [isEditing]);
+
+  useEffect(() => {
+    if (range[3]) {
+      setNotes(range[3]);
+      console.log(notes);
+    }
+  }, [ranges]);
+
   return (
     <div
-      className={`p-3 border border-gray-200 rounded-lg hover:bg-yellow-100 hover:cursor-pointer transition-all flex flex-col gap-2 ${
-        notes && "bg-green-100"
+      className={`p-3 border border-gray-200 rounded-lg hover:bg-yellow-100 transition-all flex flex-col gap-2 ${
+        currentIndex === index && "bg-green-100"
       }`}
     >
       <div className="flex justify-between">
         <AlertDialog>
-          <AlertDialogTrigger>
-            <Button variant="outline">Delete</Button>
+          <AlertDialogTrigger disabled={isFocusView}>
+            <Button variant="outline" disabled={isFocusView}>
+              Delete
+            </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -75,15 +105,23 @@ const HighlightCard: React.FC<SavedHighlightsProps> = ({
           </AlertDialogContent>
         </AlertDialog>
         <Button
+          disabled={isFocusView}
           variant="outline"
           onClick={handleEdit}
-          className={`${isEditing && "bg-orange-200"}`}
+          className={`${showEditing && "bg-orange-200"}`}
         >
-          {isEditing ? "Editing" : "Edit Selection"}
+          {showEditing ? "Editing" : "Edit Selection"}
         </Button>
       </div>
       {range[2]} <br />
-      <div className="flex justify-end">
+      <div className="flex justify-between">
+        <Button
+          variant="outline"
+          onClick={handleCardClick}
+          disabled={isFocusView}
+        >
+          Focus
+        </Button>
         {showNotes ? (
           <div className="flex gap-2">
             <AlertDialog>
@@ -106,12 +144,16 @@ const HighlightCard: React.FC<SavedHighlightsProps> = ({
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-            <Button variant="default" onClick={handleNotes}>
+            <Button variant="default" onClick={handleSaveNotes}>
               Save Note
             </Button>
           </div>
         ) : (
-          <Button variant="default" onClick={handleNotes}>
+          <Button
+            variant={notes ? "default" : "outline"}
+            onClick={handleNotes}
+            disabled={isFocusView}
+          >
             {notes ? "View Note" : "Add Note"}
           </Button>
         )}
