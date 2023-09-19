@@ -31,7 +31,8 @@ const HighlightCard: React.FC<SavedHighlightsProps> = ({ range, index }) => {
   const [isEditing, setIsEditing] = useAtom(isEditingAtom);
   const [currentIndex, setCurrentIndex] = useAtom(currentIndexAtom);
   const [isFocusView, setIsFocusView] = useAtom(isFocusViewAtom);
-  const { addHighlight, deleteHighlight, editHighlight } = useHighlights();
+  const { addHighlight, deleteHighlight, editHighlight, removeHighlightStyle } =
+    useHighlights();
 
   const [showNotes, setShowNotes] = useState(false);
   const [notes, setNotes] = useState<string>("");
@@ -49,6 +50,11 @@ const HighlightCard: React.FC<SavedHighlightsProps> = ({ range, index }) => {
   const handleDeleteNotes = () => {
     setNotes("");
     setShowNotes(!showNotes);
+  };
+
+  const handleDelete = () => {
+    removeHighlightStyle(index.toString());
+    deleteHighlight(index);
   };
 
   const handleEdit = (event: any) => {
@@ -98,7 +104,7 @@ const HighlightCard: React.FC<SavedHighlightsProps> = ({ range, index }) => {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => deleteHighlight(index)}>
+              <AlertDialogAction onClick={handleDelete}>
                 Continue
               </AlertDialogAction>
             </AlertDialogFooter>

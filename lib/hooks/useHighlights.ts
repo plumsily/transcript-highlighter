@@ -12,6 +12,7 @@ const useHighlights = () => {
     note: string
   ) => {
     setRanges((prev) => [...prev, [start, end, content, note]]);
+    return ranges.length - 1;
   };
 
   const deleteHighlight = (index: number) => {
@@ -38,10 +39,27 @@ const useHighlights = () => {
     });
   };
 
+  const removeHighlightStyle = (highlightIndex: string) => {
+    const highlightedSpans = document.querySelectorAll(
+      `[data-highlight-index="${highlightIndex}"]`
+    );
+    highlightedSpans.forEach((span) => {
+      const parent = span.parentNode;
+      if (parent) {
+        const childNodes = Array.from(span.childNodes);
+        childNodes.forEach((node) => {
+          parent.insertBefore(node, span);
+        });
+        parent.removeChild(span);
+      }
+    });
+  };
+
   return {
     addHighlight,
     deleteHighlight,
     editHighlight,
+    removeHighlightStyle,
   };
 };
 
