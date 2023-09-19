@@ -1,29 +1,13 @@
 import { useAtom } from "jotai";
-import {
-  rangesAtom,
-  isFocusViewAtom,
-  highlightIndexAtom,
-  Highlights,
-} from "../atoms";
+import { rangesAtom, isFocusViewAtom, Highlights } from "../atoms";
 
 const useHighlights = () => {
   const [ranges, setRanges] = useAtom(rangesAtom);
   const [isFocusView, setIsFocusView] = useAtom(isFocusViewAtom);
-  // const [highlightIndex, setHighlightIndex] = useAtom(highlightIndexAtom);
 
   const addHighlight = (highlight: Highlights) => {
     setRanges((prev) => [...prev, highlight]);
   };
-  // const addHighlight = (
-  //   start: number,
-  //   end: number,
-  //   content: string,
-  //   note: string,
-  //   highlightIndex: number
-  // ) => {
-  //   setRanges((prev) => [...prev, [start, end, content, note, highlightIndex]]);
-  //   return ranges.length - 1;
-  // };
 
   const deleteHighlight = (index: number) => {
     if (isFocusView) {
@@ -53,31 +37,14 @@ const useHighlights = () => {
         note: newNote,
         highlightIndex: highlightIndex,
       };
-      // newRanges[index] = [
-      //   newRange[0],
-      //   newRange[1],
-      //   newContent,
-      //   newNote,
-      //   highlightIndex,
-      // ];
       return newRanges;
     });
+    // check if the editing is to edit the text selection or a note
     if (isEditing) {
       const selection = window.getSelection();
       if (selection && selection.rangeCount > 0) {
         const range = selection.getRangeAt(0);
         removeHighlightStyle(highlightIndex.toString());
-        // setRanges((prev) => {
-        //   const newRanges = [...prev];
-        //   newRanges[index] = [
-        //     newRange[0],
-        //     newRange[1],
-        //     newContent,
-        //     newNote,
-        //     highlightIndex,
-        //   ];
-        //   return newRanges;
-        // });
         const highlightedSpan = document.createElement("mark");
         highlightedSpan.setAttribute(
           "data-highlight-index",
@@ -92,22 +59,18 @@ const useHighlights = () => {
   };
 
   const removeHighlightStyle = (highlightIndex: string) => {
-    const highlightedSpans = document.querySelectorAll(
+    const highlightedMarks = document.querySelectorAll(
       `[data-highlight-index="${highlightIndex}"]`
     );
 
-    highlightedSpans.forEach((span) => {
-      const parent = span.parentNode;
+    // find the corresponding mark element with the matching id and remove the mark
+    highlightedMarks.forEach((mark) => {
+      const parent = mark.parentNode;
       if (parent) {
-        while (span.firstChild) {
-          parent.insertBefore(span.firstChild, span);
+        while (mark.firstChild) {
+          parent.insertBefore(mark.firstChild, mark);
         }
-        parent.removeChild(span);
-        // const childNodes = Array.from(span.childNodes);
-        // childNodes.forEach((node) => {
-        //   parent.insertBefore(node, span);
-        // });
-        // parent.removeChild(span);
+        parent.removeChild(mark);
       }
     });
   };

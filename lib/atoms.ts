@@ -12,4 +12,4 @@ export const rangesAtom = atom<Highlights[]>([]);
 export const isEditingAtom = atom(false);
 export const currentIndexAtom = atom<number | null>(null);
 export const isFocusViewAtom = atom(false);
-export const highlightIndexAtom = atom<number>(0);
+export const highlightIndexAtom = atom<number>(0); //unique Id generator for each mark element that is highlighted on transcript

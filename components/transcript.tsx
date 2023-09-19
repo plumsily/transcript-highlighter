@@ -63,13 +63,6 @@ const Transcript: React.FC = () => {
             note: "",
             highlightIndex: highlightIndex,
           });
-          // addHighlight(
-          //   startOffset,
-          //   endOffset,
-          //   selectedText,
-          //   "",
-          //   highlightIndex
-          // );
 
           // use the built-in mark element to highlight the selected text
           const highlightedSpan = document.createElement("mark");
@@ -90,7 +83,7 @@ const Transcript: React.FC = () => {
       }
     } else {
       const selection = window.getSelection();
-      console.log(currentIndex, selection, isEditing);
+      // console.log(currentIndex, selection, isEditing);
       if (selection && selection.rangeCount > 0 && currentIndex !== null) {
         const range = selection.getRangeAt(0);
         const { startOffset, endOffset } = range;
@@ -112,13 +105,13 @@ const Transcript: React.FC = () => {
   // returns the transcript view to the full transcript and resets state variables
   const resetTranscript = () => {
     setCurrentTranscript(null);
-    setIsFocusView(false);
+    setIsFocusView(false); //exits focus view
     setNotes("");
   };
 
   const handleSaveNotes = () => {
     if (currentIndex !== null) {
-      console.log(currentIndex, notes);
+      // console.log(currentIndex, notes);
       editHighlight(
         currentIndex,
         [ranges[currentIndex].rangeStart, ranges[currentIndex].rangeEnd],
