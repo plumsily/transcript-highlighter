@@ -1,7 +1,7 @@
 # Quilt Labs Frontend Challenge
 
-![Main page](./public/screenshot_1.png);
-![Focus view](./public/screenshot_2.png);
+![Main page](./public/screenshot_1.png)
+![Focus view](./public/screenshot_2.png)
 
 ## Getting Started
 
