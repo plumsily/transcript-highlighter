@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -93,7 +93,9 @@ const HighlightCard: React.FC<SavedHighlightsProps> = ({ range, index }) => {
 
   return (
     <div
-      className={`p-3 border border-gray-200 rounded-lg hover:bg-yellow-100 transition-all flex flex-col gap-2`}
+      className={`p-3 border border-gray-200 rounded-lg hover:bg-yellow-100 transition-all flex flex-col gap-2 ${
+        currentIndex === index && "bg-yellow-100"
+      }`}
     >
       <div className="flex justify-between">
         <AlertDialog>

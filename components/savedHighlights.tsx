@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import {
   Card,
   CardContent,
@@ -20,8 +19,8 @@ const SavedHighlights: React.FC = () => {
         <CardHeader>
           <CardTitle>Saved Highlights</CardTitle>
           <CardDescription>
-            View your saved highlights here. Focus a highlight to enter its
-            focused view.
+            View your saved highlights here. Press Focus on a highlight to enter
+            its focused view.
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Card,
   CardContent,
@@ -27,24 +27,30 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { AlertDialogHeader, AlertDialogFooter } from "./ui/alert-dialog";
 import { useKeyPress } from "@/lib/hooks/useKeyPress";
 
 const Transcript: React.FC = () => {
   const fullTranscriptRef = useRef<HTMLDivElement>(null);
+
+  const { addHighlight, deleteHighlight, editHighlight, removeHighlightStyle } =
+    useHighlights();
+
+  //global state variables
   const [ranges, setRanges] = useAtom(rangesAtom);
   const [isEditing, setIsEditing] = useAtom(isEditingAtom);
   const [currentIndex, setCurrentIndex] = useAtom(currentIndexAtom);
   const [isFocusView, setIsFocusView] = useAtom(isFocusViewAtom);
-  const { addHighlight, deleteHighlight, editHighlight, removeHighlightStyle } =
-    useHighlights();
+  const [highlightIndex, setHighlightIndex] = useAtom(highlightIndexAtom); //state for counting highlighted portions identifiers
+
+  //local state variables
   const [currentTranscript, setCurrentTranscript] = useState<string | null>(
     null
   );
   const [editNotes, setEditNotes] = useState(false);
   const [notes, setNotes] = useState<string>("");
   const [deleteMode, setDeleteMode] = useState(false);
-  const [highlightIndex, setHighlightIndex] = useAtom(highlightIndexAtom); //state for counting highlighted portions identifiers
 
   // handle when a text selection is being made on the transcript
   const handleMouseUp = () => {
@@ -132,7 +138,7 @@ const Transcript: React.FC = () => {
     }
   };
 
-  const isCtrlPressed = useKeyPress("Control");
+  const isInsertPressed = useKeyPress("Insert");
   const isEscPressed = useKeyPress("Escape");
   const isDelPressed = useKeyPress("Delete");
   const isTabPressed = useKeyPress("Tab");
@@ -142,7 +148,7 @@ const Transcript: React.FC = () => {
       resetTranscript();
       setCurrentIndex(null);
     }
-    if (isCtrlPressed) {
+    if (isInsertPressed) {
       setEditNotes((prev) => !prev);
       if (editNotes) {
         handleSaveNotes();
@@ -155,7 +161,7 @@ const Transcript: React.FC = () => {
       const nextIndex = (currentIndex + 1) % ranges.length;
       setCurrentIndex(nextIndex);
     }
-  }, [isCtrlPressed, isDelPressed, isEscPressed, isTabPressed]);
+  }, [isInsertPressed, isDelPressed, isEscPressed, isTabPressed]);
 
   // activate focused view depending on which saved highlight was focused
   useEffect(() => {
@@ -173,15 +179,33 @@ const Transcript: React.FC = () => {
     <>
       <Card className="">
         <CardHeader>
-          <CardTitle>Transcript</CardTitle>
+          <CardTitle>
+            <div className="flex justify-between">
+              <span>Transcript</span>
+              {currentTranscript && <Badge>Focus View</Badge>}
+            </div>
+          </CardTitle>
           <CardDescription>
-            <p>Select any piece of text to automatically save highlights.</p>
-            <p>Press Esc to exit focus view.</p>
-            <p>
-              Press Ctrl to enter or exit note editing mode (exiting will save
-              note).
-            </p>
-            <p>Press Del to delete the current highlight.</p>
+            <div className="flex flex-col gap-1">
+              {currentTranscript ? (
+                <>
+                  <div className="flex flex-col text-right">
+                    <p>Press Esc to exit focus view.</p>
+                    <p>Press Tab to cycle between highlights in focus view.</p>
+                    <p>
+                      Press Insert to enter or exit note editing mode (exiting
+                      will save note).
+                    </p>
+                    <p>Press Del to delete the current highlight.</p>
+                  </div>
+                  <Separator className="my-4" />
+                </>
+              ) : (
+                <p>
+                  Select any piece of text to automatically save highlights.
+                </p>
+              )}
+            </div>
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -250,7 +274,7 @@ const Transcript: React.FC = () => {
             </div>
             {isFocusView && currentIndex !== null && (
               <div className="flex flex-col">
-                <Separator className="my-4" />
+                <Separator className="my-6" />
                 <div className="flex flex-col gap-2">
                   <CardTitle>Notes:</CardTitle>
                   <AlertDialog open={deleteMode}>
