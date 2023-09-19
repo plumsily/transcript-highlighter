@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import HighlightCard from "./ui/highlightCard";
 import { useAtom } from "jotai";
-import { rangesAtom } from "../lib/atoms";
+import { rangesAtom, Highlights } from "../lib/atoms";
 
 const SavedHighlights: React.FC = () => {
   const [ranges, setRanges] = useAtom(rangesAtom);

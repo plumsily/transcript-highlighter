@@ -18,12 +18,13 @@ import {
   isEditingAtom,
   currentIndexAtom,
   isFocusViewAtom,
+  Highlights,
 } from "../../lib/atoms";
 import useHighlights from "../../lib/hooks/useHighlights";
 
 interface SavedHighlightsProps {
   index: number;
-  range: [number, number, string, string];
+  range: Highlights;
 }
 
 const HighlightCard: React.FC<SavedHighlightsProps> = ({ range, index }) => {
@@ -31,7 +32,7 @@ const HighlightCard: React.FC<SavedHighlightsProps> = ({ range, index }) => {
   const [isEditing, setIsEditing] = useAtom(isEditingAtom);
   const [currentIndex, setCurrentIndex] = useAtom(currentIndexAtom);
   const [isFocusView, setIsFocusView] = useAtom(isFocusViewAtom);
-  const { addHighlight, deleteHighlight, editHighlight, removeHighlightStyle } =
+  const { deleteHighlight, editHighlight, removeHighlightStyle } =
     useHighlights();
 
   const [showNotes, setShowNotes] = useState(false);
@@ -43,7 +44,13 @@ const HighlightCard: React.FC<SavedHighlightsProps> = ({ range, index }) => {
   };
 
   const handleSaveNotes = () => {
-    editHighlight(index, [range[0], range[1]], range[2], notes);
+    editHighlight(
+      index,
+      [range.rangeStart, range.rangeEnd],
+      range.content,
+      notes,
+      range.highlightIndex
+    );
     setShowNotes(!showNotes);
   };
 
@@ -53,17 +60,20 @@ const HighlightCard: React.FC<SavedHighlightsProps> = ({ range, index }) => {
   };
 
   const handleDelete = () => {
-    removeHighlightStyle(index.toString());
+    removeHighlightStyle(range.highlightIndex.toString());
     deleteHighlight(index);
+    setNotes("");
   };
 
+  // send signal to transcript.tsx to start modifying the selection range on the transcript
   const handleEdit = (event: any) => {
     setIsEditing(true);
     setShowEditing(true);
     setCurrentIndex(index);
   };
 
-  const handleCardClick = () => {
+  // send signal to transcript.tsx to enter focused view
+  const handleFocusClick = () => {
     setIsFocusView(true);
     setCurrentIndex(index);
   };
@@ -75,17 +85,15 @@ const HighlightCard: React.FC<SavedHighlightsProps> = ({ range, index }) => {
   }, [isEditing]);
 
   useEffect(() => {
-    if (range[3]) {
-      setNotes(range[3]);
+    if (range.note) {
+      setNotes(range.note);
       console.log(notes);
     }
   }, [ranges]);
 
   return (
     <div
-      className={`p-3 border border-gray-200 rounded-lg hover:bg-yellow-100 transition-all flex flex-col gap-2 ${
-        currentIndex === index && "bg-green-100"
-      }`}
+      className={`p-3 border border-gray-200 rounded-lg hover:bg-yellow-100 transition-all flex flex-col gap-2`}
     >
       <div className="flex justify-between">
         <AlertDialog>
@@ -119,11 +127,11 @@ const HighlightCard: React.FC<SavedHighlightsProps> = ({ range, index }) => {
           {showEditing ? "Editing" : "Edit Selection"}
         </Button>
       </div>
-      {range[2]} <br />
+      {range.content} <br />
       <div className="flex justify-between">
         <Button
           variant="outline"
-          onClick={handleCardClick}
+          onClick={handleFocusClick}
           disabled={isFocusView}
         >
           Focus
