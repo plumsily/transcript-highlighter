@@ -1,4 +1,4 @@
-# Quilt Labs Frontend Challenge
+# Quilt Labs Full Stack Role Assessment
 
 ![Main page](./public/screenshot_1.png)
 ![Focus view](./public/screenshot_2.png)
