@@ -1,4 +1,4 @@
-# Quilt Labs Full Stack Role Assessment
+# Quilt Labs Assessment
 
 ![Main page](./public/screenshot_1.png)
 ![Focus view](./public/screenshot_2.png)
